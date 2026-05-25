@@ -288,6 +288,18 @@ func applyUserDefinedModel(body []byte, modelInfo *registry.ModelInfo, fromForma
 		"level":    config.Level,
 	}).Debug("thinking: applying config for user-defined model (skip validation)")
 
+	// Clamp unsupported levels for user-defined models that declare a Levels list.
+	// Example: a codex alias inherits its underlying GPT model's Levels (which
+	// may not include "max"); the bare ApplyThinking path skips ValidateConfig
+	// entirely, so without this clamp an unsupported level is forwarded to the
+	// upstream and rejected. Reuses clampLevel from validate.go so new entries
+	// in standardLevelOrder are handled automatically.
+	if config.Mode == ModeLevel && modelInfo != nil && modelInfo.Thinking != nil &&
+		len(modelInfo.Thinking.Levels) > 0 &&
+		!isLevelSupported(string(config.Level), modelInfo.Thinking.Levels) {
+		config.Level = clampLevel(config.Level, modelInfo, toFormat)
+	}
+
 	config = normalizeUserDefinedConfig(config, fromFormat, toFormat)
 	return applier.Apply(body, config, modelInfo)
 }
