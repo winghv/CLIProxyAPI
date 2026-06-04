@@ -7,6 +7,9 @@ config.yaml
 config-*.yaml
 .env
 
+# Local ops secrets (real config holds upstream keys; commit the .example only)
+health_priority.config.json
+
 # Generated content
 bin/*
 logs/*

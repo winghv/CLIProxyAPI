@@ -1,0 +1,22 @@
+{
+  "config_path": "/opt/cli-proxy-api-openai/config.yaml",
+  "state_path": "/opt/cli-proxy-api-openai/health_state.json",
+  "mgmt_password": "REPLACE_WITH_MANAGEMENT_PASSWORD",
+  "usage_url": "http://localhost:8318/v0/management/usage-queue",
+  "thresholds": {
+    "window_s": 180,
+    "probe_timeout": 30,
+    "err_threshold": 0.30,
+    "lat_threshold_ms": 28000,
+    "min_samples": 5,
+    "recovery_consec": 3,
+    "cooldown_minutes": 5
+  },
+  "providers": {
+    "zzshu":    {"key": "sk-REPLACE", "url": "https://us.zzshu.cc/v1",        "ideal": 260},
+    "mc666":    {"key": "sk-REPLACE", "url": "https://api.mc666.xyz/v1",      "ideal": 250},
+    "codelife": {"key": "sk-REPLACE", "url": "https://api.codelife.eu.cc/v1", "ideal": 230},
+    "apiaqi":   {"key": "sk-REPLACE", "url": "https://api2.apiaqi.com/v1",    "ideal": 210},
+    "codeapx":  {"key": "apx-REPLACE","url": "https://ai.codeapx.com/v1",     "ideal": 200}
+  }
+}
