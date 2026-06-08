@@ -61,8 +61,21 @@ COOLDOWN_MINUTES = _TH.get("cooldown_minutes", 5)
 
 PROVIDERS = _CFG["providers"]
 
-KEY_TO_NAME = {v["key"]: k for k, v in PROVIDERS.items()}
-URL_TO_NAME = {v["url"]: k for k, v in PROVIDERS.items()}
+# Build api_key → provider_name map, supporting both single "key" and list "keys"
+KEY_TO_NAME: dict[str, str] = {}
+for name, cfg in PROVIDERS.items():
+    keys = cfg.get("keys", [cfg.get("key")])
+    for k in keys:
+        if k:
+            KEY_TO_NAME[k] = name
+URL_TO_NAME: dict[str, str] = {v["url"]: k for k, v in PROVIDERS.items()}
+
+
+def _get_probe_key(name: str) -> str:
+    """Return one API key for recovery probes (first available)."""
+    cfg = PROVIDERS[name]
+    keys = cfg.get("keys", [cfg.get("key")])
+    return keys[0] if keys else ""
 
 
 # ── Helpers ────────────────────────────────────────────
@@ -198,7 +211,7 @@ def probe_upstream(name: str) -> tuple[bool, float]:
     }).encode("utf-8")
 
     req = urllib.request.Request(url, data=body)
-    req.add_header("Authorization", f"Bearer {cfg['key']}")
+    req.add_header("Authorization", f"Bearer {_get_probe_key(name)}")
     req.add_header("Content-Type", "application/json")
 
     start = time.monotonic()
