@@ -53,6 +53,15 @@ func TestShouldSkipMethodForRequestLogging(t *testing.T) {
 			skip: false,
 		},
 		{
+			name: "codex responses websocket upgrade should not skip",
+			req: &http.Request{
+				Method: http.MethodGet,
+				URL:    &url.URL{Path: "/backend-api/codex/responses"},
+				Header: http.Header{"Upgrade": []string{"websocket"}},
+			},
+			skip: false,
+		},
+		{
 			name: "responses get without upgrade should skip",
 			req: &http.Request{
 				Method: http.MethodGet,
@@ -144,17 +153,17 @@ func TestShouldCaptureRequestBody(t *testing.T) {
 	}
 }
 
-func TestAttachWebsocketLogSourcesUsesLoggerLogsDir(t *testing.T) {
+func TestAttachRequestLogSourcesUsesLoggerLogsDir(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	logsDir := t.TempDir()
 	logger := logging.NewFileRequestLogger(true, logsDir, "", 0)
 	recorder := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(recorder)
-	c.Request = httptest.NewRequest(http.MethodGet, "/v1/responses", nil)
+	c.Request = httptest.NewRequest(http.MethodGet, "/backend-api/codex/responses", nil)
 	c.Request.Header.Set("Upgrade", "websocket")
 
-	attachWebsocketLogSources(c, logger, true)
+	attachRequestLogSources(c, logger, true)
 	defer cleanupFileBodySourcesFromContext(c)
 
 	for _, key := range []string{
